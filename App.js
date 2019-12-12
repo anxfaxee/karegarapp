@@ -7,7 +7,7 @@ import deviceStorage from './services/deviceStorage.js';
 import Home from "./screens/Home.js";
 import auth from '@react-native-firebase/auth';
 import { firebase } from '@react-native-firebase/auth';
-
+// call and api can be moved to redux store
 export default class App extends Component {
     constructor() {
         super();
