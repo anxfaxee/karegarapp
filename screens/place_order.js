@@ -104,6 +104,7 @@ export default class PlaceOrder extends Component {
         this.setState({ isDatePickerVisible: true });
     };
     getAddress = () => {
+        return this.selectOnMap();
         this.setState({ loading: true });
         Geolocation.getCurrentPosition(
             (position) => {
@@ -582,7 +583,7 @@ export default class PlaceOrder extends Component {
                                 onCancel={this.hideTimePicker}
                             />
                         </View> */}
-
+                            {/* 
                             <View style={[styles.secCont, { height: 150, borderWidth: 1, borderColor: "#ccc", marginBottom: 10, marginTop: 10, }]}>
 
 
@@ -602,7 +603,7 @@ export default class PlaceOrder extends Component {
                                 >
 
                                 </MapView>
-                            </View>
+                            </View> */}
                             <View style={styles.secCont}>
                                 <View style={styles.secContBorder}>
                                     <Textarea rowSpan={2} placeholder="Note" onChangeText={note => this.setState({ note })} />

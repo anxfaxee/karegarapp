@@ -128,7 +128,7 @@ export default class Map extends Component {
 
     }
     componentWillUnmount() {
-        Geolocation.clearWatch(this.watchID);
+        // Geolocation.clearWatch(this.watchID);
     }
     async requestLocationPermission() {
         const chckLocationPermission = PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
@@ -171,9 +171,9 @@ export default class Map extends Component {
                         apiKey={MAP_API_KEY}
                         onLocationSelect={(res) => {
                             console.log(res)
-                            // const { navigation } = this.props;
-                            // navigation.goBack();
-                            // navigation.state.params.handler(res);
+                            const { navigation } = this.props;
+                            navigation.goBack();
+                            navigation.state.params.handler(res);
                         }}
                         actionButtonStyle={{ borderWidth: 2, backgroundColor: "#fff", justifyContent: "center", alignItems: "center", borderRadius: 6, borderColor: "#ffca08" }}
                         actionTextStyle={{ color: "#000", }}
