@@ -1,12 +1,13 @@
 import React, { Component } from "react";
-import { View, SafeAreaView, Button, Alert } from "react-native";
+import { View, SafeAreaView, Button, Alert, Text } from "react-native";
 
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createDrawerNavigator, DrawerItems } from 'react-navigation-drawer';
+import { Button as StyledButton } from 'native-base';
 
 import how_it_works from './how_it_works';
-
+import help from "./help";
 import order_history from './order_history';
 import KG_Services from "./KG_Services";
 import MyNativeMap from "./MyNativeMap";
@@ -65,18 +66,52 @@ const AppStack = createDrawerNavigator({
   "Order History": { screen: order_history },
   // Notifications: { screen: notifications },
   // Packages: { screen: packages },
-  // Help: { screen: help },
-  About: { screen: about },
+
+  // "About": { screen: about },
+  "Contact": { screen: help },
   // Logout: { screen: help },
 }, {
   drawerWidth: 300,
   drawerPosition: "left",
   initialRouteName: "Services",
+  contentOptions: {
+
+    activeLabelStyle: {
+      fontSize: 16,
+      color: "#ffca08",
+    }
+  },
   contentComponent: (props) => (
     <View style={{ flex: 1 }}>
       <SafeAreaView forceInset={{ top: 'always', horizontal: 'never' }}>
         <DrawerItems {...props} />
-        <Button title="Logout" onPress={() => {
+        <StyledButton style={{ backgroundColor: "#ffca08", justifyContent: "center", alignItems: "center" }}
+          onPress={() => {
+            console.log(props);
+            Alert.alert(
+              'Log out',
+              'Do you want to logout?',
+              [
+                { text: 'Cancel', onPress: () => { return null } },
+                {
+                  text: 'Confirm', onPress: () => {
+                    deviceStorage.logMeOut().then(() => {
+
+                      props.navigation.navigate('Auth');
+                      console.log("bb");
+                    });
+
+                  }
+                },
+              ],
+              { cancelable: false }
+            )
+
+
+          }}>
+          <Text>Logout</Text>
+        </StyledButton>
+        {/* <Button style={{ fontColor: "#000" }} textColor="#000" color="#ffca08" title="Logout" onPress={() => {
           console.log(props);
           Alert.alert(
             'Log out',
@@ -98,7 +133,7 @@ const AppStack = createDrawerNavigator({
           )
 
 
-        }} />
+        }} /> */}
       </SafeAreaView>
     </View>
   ),

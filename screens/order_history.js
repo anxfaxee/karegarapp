@@ -8,12 +8,13 @@ import AppHeader from '../components/AppHeader';
 import deviceStorage from '../services/deviceStorage.js';
 import { Loading } from '../components/common/';
 import axios from 'axios';
-const sttus = [
-    'Un-Assigned',
-    'Assigned',
-    'Pending payment',
-    'Complete',
-]
+const sttus = {
+    "-1": "Cancelled",
+    "0": 'Un-Assigned',
+    "1": 'Assigned',
+    "2": 'Pending payment',
+    "3": 'Complete',
+}
 export default class order_history extends Component {
     //Screen1 Component
 
@@ -39,6 +40,57 @@ export default class order_history extends Component {
         this.setState({
             jwt: jwt
         });
+    }
+    cancelOrder(orderId) {
+        // return console.log(orderId);
+        this.setState({
+
+            loading: true,
+        });
+        const headers = {
+            Authorization: 'Bearer ' + this.state.jwt,
+        };
+
+        // //console.log(serviceData);
+        // NOTE Post to HTTPS only in 
+
+        axios.post("http://karigar.greelogix.com/api/orders/" + orderId + "/cancel", {}, {
+            headers: headers
+        }).then(response => {
+            console.log('aa')
+            console.log(response.data);
+            this.setState({
+
+                loading: false,
+            });
+            if (response.data.status == "success") {
+                // alert(response.data.message);
+                this.setState({
+                    orders: response.data.orders,
+                    loading: false,
+                });
+
+                // alert("Order Placed Successfully");
+
+
+            } else {
+                this.setState({
+                    loading: false,
+                    error: response.data.message,
+                });
+
+                // alert(response.data.message);
+            }
+
+        })
+            .catch((error) => {
+                this.setState({
+                    loading: false,
+                    error: error,
+                });
+                // alert(error);
+
+            });
     }
     loadOrders = () => {
         console.log("Orders loading")
@@ -91,7 +143,16 @@ export default class order_history extends Component {
                                     <View style={[styles.itemSecContRow], { width: "100%" }}>
 
                                         <View>
-                                            <Text style={{ fontSize: 22, textAlign: "left" }}>{item.service.name} </Text>
+                                            <Text style={{ fontSize: 22, textAlign: "left" }}>{item.service.name}
+                                                {(item.status > -1) &&
+                                                    <Text onPress={() => {
+                                                        this.cancelOrder(item.id);
+                                                    }} style={{ marginLeft: 5, lineHeight: 22, fontSize: 12, color: "red" }}>    ( Cancel )</Text>
+                                                }
+                                            </Text>
+
+
+
                                         </View>
 
                                     </View>

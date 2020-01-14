@@ -1,7 +1,7 @@
 //This is an example code for NavigationDrawer//
 import React, { Component } from 'react';
 //import react in our code.
-import { ScrollView, Dimensions, StyleSheet, View, Button, Text, Image, TouchableOpacity, Picker } from 'react-native';
+import { ScrollView, Dimensions, StyleSheet, View, Button, Text, Image, TouchableOpacity, Picker, Linking } from 'react-native';
 import { DrawerActions } from 'react-navigation-drawer';
 import { Container, Header, Content, Textarea, Item, Input, Icon, Button as StyledButton, Toast } from 'native-base';
 import { ToastAndroid } from 'react-native';
@@ -58,8 +58,11 @@ export default class PlaceOrder extends Component {
             userLat: "",
             userLong: "",
             services: [],
+            servicesRaw: [],
             showToast: false,
             mapReady: false,
+            phoneNum: "0308-1126999",
+            service_desc: "",
         };
         this.toggleDrawer = this.toggleDrawer.bind(this);
         this.fetchUserData = this.fetchUserData.bind(this);
@@ -155,6 +158,12 @@ export default class PlaceOrder extends Component {
         // })
 
     }
+    makeCall = () => {
+        console.log("phone");
+        let phoneNumber = this.state.phoneNum;
+        Linking.openURL(`tel:${phoneNumber}`);
+
+    }
     hideDatePicker = () => {
         this.setState({ isDatePickerVisible: false });
     };
@@ -194,7 +203,7 @@ export default class PlaceOrder extends Component {
         this.props.navigation.navigate("MyNativeMap", { handler: this.handler });
     }
     placeOrderNow() {
-        const { email, name, address, lat, long, phone, defaultDate, defaultTime, service_id } = this.state;
+        const { email, name, address, lat, long, phone, defaultDate, defaultTime, service_id, note } = this.state;
         // const { navigate } = this.props.navigation;
         // this.setState({ error: '', loading: true });
         // //console.log(service_id);
@@ -247,6 +256,7 @@ export default class PlaceOrder extends Component {
             service_date: defaultDate,
             service_time: defaultTime,
             service_id: service_id,
+            note: note,
 
         };
         // //console.log(serviceData);
@@ -311,12 +321,16 @@ export default class PlaceOrder extends Component {
             // var servies = response.data.services.map((currentValue, index, ar) => {
             //     return { id: currentValue.id, title: currentValue.name };
             // });
-            // //console.log(servies)
+            // console.log(response.data.serviesRaw);
+            let servicesRaw = response.data.serviesRaw;
+            let service = servicesRaw[this.state.service_id];
             this.setState({
                 email: response.data.email,
                 name: response.data.name,
                 phone: response.data.phone_number,
                 services: response.data.services,
+                servicesRaw: response.data.serviesRaw,
+                service_desc: service.description,
                 loading: false,
             });
 
@@ -447,28 +461,40 @@ export default class PlaceOrder extends Component {
                 </View>
             );
         } else {
-            const { services } = this.state;
+            const { services, servicesRaw } = this.state;
             //console.log(services);
             //console.log("aaaa")
             const { errorText } = styles;
             return (
                 <View style={{ flex: 1 }}>
+                    <View style={styles.bottomView} >
+
+                        <StyledButton onPress={this.makeCall} style={{ backgroundColor: "#fff", justifyContent: "center", alignItems: "center", flex: 1 }} transparent>
+                            <Icon name='md-call' />
+                        </StyledButton>
+
+                    </View>
                     <AppHeader title="Place Order" navigation={this.props.navigation} />
-                    <ScrollView>
+                    <ScrollView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
                         {/* <View style={{ justifyContent: "center", alignItems: "center", marginHorizontal: -15, height: 100, backgroundColor: "#0065b3" }}>
                         <Image style={styles.imageThumbnail} source={require('../../assets/logo.jpg')} />
                     </View> */}
                         <View style={styles.MainContainer}>
 
 
-
+                            <Text>  {this.state.service_desc}</Text>
                             <View style={styles.secCont}>
                                 <View style={styles.secContBorder}>
                                     <Picker
                                         mode={"dropdown"}
                                         selectedValue={this.state.service_id}
-                                        onValueChange={(itemValue, itemIndex) =>
-                                            this.setState({ service_id: itemValue })
+                                        onValueChange={(itemValue, itemIndex) => {
+                                            // console.log(services)
+                                            let service = servicesRaw[itemValue]
+                                            // console.log(service)
+                                            this.setState({ service_id: itemValue, service_desc: service.description })
+                                        }
+
                                         }>
                                         {services.map((current) => {
 
@@ -477,7 +503,9 @@ export default class PlaceOrder extends Component {
                                         {/* <Picker.Item label="Java" value="java" />
                                     <Picker.Item label="JavaScript" value="js" /> */}
                                     </Picker>
+
                                 </View>
+
                             </View>
                             <View style={styles.secCont}>
                                 <View style={styles.secContBorder}>
@@ -551,14 +579,15 @@ export default class PlaceOrder extends Component {
                                         <View style={styles.secContBorder}>
                                             <Item >
                                                 {/* <Icon active name='md-phone-portrait' /> */}
-                                                <Input placeholder='Address' value={this.state.address} onChangeText={address => this.setState({ address })} />
+                                                <Textarea rowSpan={2} style={{ lineHeight: 14, fontSize: 12 }} placeholder="Address" value={this.state.address} onChangeText={address => this.setState({ address })} />
+                                                {/* <Input placeholder='Address' value={this.state.address} onChangeText={address => this.setState({ address })} /> */}
 
                                             </Item>
                                         </View>
                                     </View>
-                                    <View style={{ flex: 1, marginLeft: 10 }}>
+                                    <View style={{ flex: 1, marginLeft: 5 }}>
 
-                                        <StyledButton disabled={!this.state.mapReady} onPress={this.getAddress} style={{ borderWidth: 2, backgroundColor: "#fff", justifyContent: "center", alignItems: "center", borderRadius: 6, borderColor: "#ffca08", flex: 1 }} transparent>
+                                        <StyledButton disabled={!this.state.mapReady} onPress={this.getAddress} style={{ borderWidth: 2, backgroundColor: "#fff", justifyContent: "center", alignItems: "center", borderRadius: 6, borderColor: "#ffca08", flex: 1 }} >
                                             <Icon name='locate' />
                                         </StyledButton>
                                     </View>
@@ -606,9 +635,10 @@ export default class PlaceOrder extends Component {
                             </View> */}
                             <View style={styles.secCont}>
                                 <View style={styles.secContBorder}>
-                                    <Textarea rowSpan={2} placeholder="Note" onChangeText={note => this.setState({ note })} />
+                                    <Textarea style={{ lineHeight: 14, fontSize: 12 }} rowSpan={2} placeholder="Note" onChangeText={note => this.setState({ note })} />
                                 </View>
                             </View>
+
                             <View style={[styles.secCont]}>
                                 <StyledButton onPress={this.placeOrderNow} style={{ borderWidth: 2, backgroundColor: "#fff", justifyContent: "center", alignItems: "center", borderRadius: 6, borderColor: "#ffca08" }} transparent>
                                     <Text>Submit</Text>
@@ -716,5 +746,20 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
 
+    },
+    bottomView: {
+        width: 50,
+        height: 50,
+        backgroundColor: '#FF9800',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        bottom: 10,
+        right: 10,
+        borderRadius: 50,
+        overflow: "hidden",
+        borderWidth: 2,
+        borderColor: "#ffca08",
+        zIndex: 9,
     }
 });

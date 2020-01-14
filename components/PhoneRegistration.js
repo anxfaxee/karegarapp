@@ -251,7 +251,6 @@ export default class PhoneRegistration extends Component {
               <Item style={{ borderBottomWidth: 0 }}>
                 <Icon active name='md-person' android="md-person" />
                 <MyInput
-                  secureTextEntry
                   placeholder="Name"
                   label="Name"
                   value={name}
@@ -360,8 +359,8 @@ const styles = StyleSheet.create({
     color: '#000',
     paddingRight: 5,
     paddingLeft: 5,
-    fontSize: 18,
-    lineHeight: 23,
+    fontSize: 16,
+    lineHeight: 24,
     // flex: 3,
 
   }

@@ -8,7 +8,8 @@ import {
     Image,
     TouchableOpacity,
     TouchableWithoutFeedback,
-    Dimensions
+    Dimensions,
+    Linking
 } from 'react-native';
 import { Button, Loading } from '../components/common/';
 import axios from 'axios';
@@ -18,6 +19,7 @@ const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 var thumbnailWidth = (width / 3) - 80;
 import PlaceOrder from "./place_order";
+import { Right, Icon, Button as StyledButton } from 'native-base';
 
 export default class KG_Services extends Component {
 
@@ -28,6 +30,7 @@ export default class KG_Services extends Component {
             error: "",
             loading: true,
             services: {},
+            phoneNum: "0308-1126999",
         }
         this.newJWT = this.newJWT.bind(this);
         this.deleteJWT = deviceStorage.deleteJWT.bind(this);
@@ -47,6 +50,12 @@ export default class KG_Services extends Component {
         this.setState({
             jwt: jwt
         });
+    }
+    makeCall = () => {
+        console.log("phone");
+        let phoneNumber = this.state.phoneNum;
+        Linking.openURL(`tel:${phoneNumber}`);
+
     }
     placeOrderScreen = (id, child_services_count) => {
         console.log("aaa");
@@ -110,31 +119,41 @@ export default class KG_Services extends Component {
             );
         } else if (typeof services != 'undefined' && services.length) {
             return (
+                <View style={{ flex: 1 }}>
+                    <View style={styles.bottomView} >
 
-                <ScrollView style={container}>
-                    <AppHeader title="Services" navigation={this.props.navigation} />
-                    <FlatList
-                        style={{ padding: 5, flex: 1 }}
-                        numColumns={3}
-                        keyExtractor={(item, index) => item.id}
-                        data={services}
-                        renderItem={({ item }) => (
+                        <StyledButton onPress={this.makeCall} style={{ backgroundColor: "#fff", justifyContent: "center", alignItems: "center", flex: 1 }} transparent>
+                            <Icon name='md-call' />
+                        </StyledButton>
 
-                            <View style={itemCont} >
-                                <TouchableOpacity onPress={() => {
-                                    this.placeOrderScreen(item.id, item.child_services_count)
-                                }}>
-                                    <Image style={imageThumbnail} source={{ uri: item.image }} />
-                                    <Text style={titleText}>{item.name}</Text>
-                                </TouchableOpacity>
-                            </View>
+                    </View>
 
-                        )}
-                    />
+                    <ScrollView style={container}>
+                        <AppHeader title="Services" navigation={this.props.navigation} />
+
+                        <FlatList
+                            style={{ padding: 5, flex: 1 }}
+                            numColumns={3}
+                            keyExtractor={(item, index) => item.id}
+                            data={services}
+                            renderItem={({ item }) => (
+
+                                <View style={itemCont} >
+                                    <TouchableOpacity onPress={() => {
+                                        this.placeOrderScreen(item.id, item.child_services_count)
+                                    }}>
+                                        <Image style={imageThumbnail} source={{ uri: item.image }} />
+                                        <Text style={titleText}>{item.name}</Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                            )}
+                        />
 
 
 
-                </ScrollView>
+                    </ScrollView>
+                </View>
             );
         }
         else {
@@ -161,7 +180,7 @@ const styles = {
     },
     itemCont: {
 
-        flex: 0.33,
+        width: (width / 3) - 14,
         flexDirection: 'row',
         margin: 5,
         padding: 5,
@@ -192,5 +211,20 @@ const styles = {
         height: height / (height / thumbnailWidth),
         alignSelf: "center"
 
+    },
+    bottomView: {
+        width: 50,
+        height: 50,
+        backgroundColor: '#FF9800',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        bottom: 10,
+        right: 10,
+        borderRadius: 50,
+        overflow: "hidden",
+        borderWidth: 2,
+        borderColor: "#ffca08",
+        zIndex: 9,
     }
 };

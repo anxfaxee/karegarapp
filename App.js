@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Image, Text } from 'react-native';
+import { View, StyleSheet, Image, Text, Linking } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
 import axios from 'axios';
 import Auth from './screens/Auth';
@@ -7,14 +7,17 @@ import deviceStorage from './services/deviceStorage.js';
 import Home from "./screens/Home.js";
 import auth from '@react-native-firebase/auth';
 import { firebase } from '@react-native-firebase/auth';
-
+import { Button } from './components/common';
+import { Right, Icon, Button as StyledButton } from 'native-base';
 export default class App extends Component {
     constructor() {
         super();
         this.state = {
             jwt: '',
             loading: true,
-            isConnected: false
+            splashLoading: true,
+            isConnected: false,
+            phoneNum: "0308-1126999",
         }
         this.newJWT = this.newJWT.bind(this);
         this.deleteJWT = deviceStorage.deleteJWT.bind(this);
@@ -53,11 +56,15 @@ export default class App extends Component {
 
             }).catch(error => {
                 console.log(error);
+                this.setState({
+                    error: error,
+                    loading: false,
+                });
 
             });
-            // setTimeout(() => {
-            //     this.setState({ loading: false });
-            // }, 2000)
+            setTimeout(() => {
+                this.setState({ splashLoading: false });
+            }, 3000)
             // 
         });
     }
@@ -86,11 +93,16 @@ export default class App extends Component {
             jwt: jwt
         });
     }
+    makeCall = () => {
+        console.log("phone");
+        let phoneNumber = this.state.phoneNum;
+        Linking.openURL(`tel:${phoneNumber}`);
 
+    }
     render() {
         const { form, imageThumbnail } = styles;
         const { isConnected } = this.state;
-        if (this.state.loading) {
+        if (this.state.loading && this.state.splashLoading) {
             return (
                 <View style={form}>
                     <View style={{ justifyContent: "center", alignItems: "center" }}>
@@ -108,11 +120,19 @@ export default class App extends Component {
                             Call Today!
                         </Text>
                         <Text style={{ fontSize: 24, color: "#000", fontWeight: "bold" }}>
-                            0800-SFTM
+                            {this.state.phoneNum}
                         </Text>
-                        <Text style={{ fontSize: 18 }}>
-                            (08000-7836)
+
+                        <Text style={{ fontSize: 24, color: "#000", fontWeight: "bold" }}>
+                            042-35116999
                         </Text>
+                        {/* <Text style={{ fontSize: 20, color: "#0065b3", fontWeight: "bold" }}>
+                            Mail Us!
+                        </Text>
+                        <Text style={{ fontSize: 24, color: "#000", fontWeight: "bold" }}>
+                            karegar.pk@hotmail.com
+                        </Text> */}
+
                     </View>
                 </View>
 
@@ -137,7 +157,10 @@ export default class App extends Component {
             if (this.state.jwt != "") {
                 console.log('wohoho')
                 return (
-                    <Home newJWT={this.newJWT} />
+                    <View style={{ flex: 1 }}>
+                        <Home newJWT={this.newJWT} />
+
+                    </View>
                 );
             } else {
                 console.log('cohoho')
@@ -165,6 +188,11 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         marginTop: 15,
     },
+    textStyle: {
+
+        color: '#fff',
+        fontSize: 22
+    },
     errorTextStyle: {
         alignSelf: 'center',
         fontSize: 18,
@@ -175,5 +203,22 @@ const styles = StyleSheet.create({
         width: 150,
         height: 150,
 
+    },
+    bottomView: {
+
+        width: 50,
+        height: 50,
+        backgroundColor: '#FF9800',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        bottom: 10,
+        right: 10,
+        borderRadius: 50,
+        overflow: "hidden",
+        borderWidth: 2,
+        borderColor: "#ffca08",
+        zIndex: 9,
     }
+
 });
