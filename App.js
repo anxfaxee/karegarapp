@@ -154,7 +154,7 @@ export default class App extends Component {
             );
         }
         else {
-            if (this.state.jwt != "") {
+            if (this.state.jwt != "" || 1 == 1) {
                 console.log('wohoho')
                 return (
                     <View style={{ flex: 1 }}>

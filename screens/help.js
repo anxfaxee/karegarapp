@@ -31,9 +31,7 @@ export default class help extends Component {
                     </View>
 
                     <View style={{ marginVertical: 5, justifyContent: "center", alignItems: "center" }}>
-                        <Text style={{ fontSize: 24, color: "#0065b3", fontWeight: "bold" }}>
-                            Imran Haider
-                        </Text>
+
 
                         <Text style={{ fontSize: 18, color: "#000", fontWeight: "bold" }}>
                             0308-1126999

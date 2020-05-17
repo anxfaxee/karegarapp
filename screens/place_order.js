@@ -6,6 +6,7 @@ import { DrawerActions } from 'react-navigation-drawer';
 import { Container, Header, Content, Textarea, Item, Input, Icon, Button as StyledButton, Toast } from 'native-base';
 import { ToastAndroid } from 'react-native';
 import LocationView from "react-native-location-view";
+import { getUniqueId, getManufacturer } from 'react-native-device-info';
 
 import MapView from 'react-native-maps';
 import Marker from 'react-native-maps';
@@ -40,6 +41,7 @@ export default class PlaceOrder extends Component {
                 // defaultDate: "aaaaaaaaaaa",
                 // defaultTime: "aaaaaaaaaaa",
             },
+            unique_id: "",
             loading: true,
             email: '',
             name: '',
@@ -71,11 +73,11 @@ export default class PlaceOrder extends Component {
         this.getAddress = this.getAddress.bind(this);
         this.handler = this.handler.bind(this)
 
-
+        this.fetchUserData();
         this.loadJWT().then(() => {
             // //console.log(res)
 
-            this.fetchUserData();
+
         });
     }
     handler(res) {
@@ -203,12 +205,18 @@ export default class PlaceOrder extends Component {
         this.props.navigation.navigate("MyNativeMap", { handler: this.handler });
     }
     placeOrderNow() {
+        var unique_id = getUniqueId();
         const { email, name, address, lat, long, phone, defaultDate, defaultTime, service_id, note } = this.state;
         // const { navigate } = this.props.navigation;
         // this.setState({ error: '', loading: true });
         // //console.log(service_id);
         // return;
         var errorsChecked = {};
+        // if (email == "") {
+        //     errorsChecked["email"] = "Email is required";
+
+        //     // return alert("Name field is required");
+        // }
         if (name == "") {
             errorsChecked["name"] = "Name is required";
 
@@ -262,11 +270,11 @@ export default class PlaceOrder extends Component {
         // //console.log(serviceData);
         // NOTE Post to HTTPS only in 
 
-        axios.post("http://karigar.greelogix.com/api/orders", serviceData, {
+        axios.post("http://karigar.greelogix.com/api/orders/" + unique_id, serviceData, {
             headers: headers
         }).then(response => {
 
-            //console.log(response);
+            console.log(response);
             if (response.data.status == "success") {
                 // alert(response.data.message);
                 this.setState({
@@ -299,18 +307,18 @@ export default class PlaceOrder extends Component {
             });
     }
     fetchUserData = () => {
-        //console.log("user loading")
-
+        // console.log("deviceid " + )
+        var unique_id = getUniqueId();
         // //console.log(this.state.jwt)
         const headers = {
             Authorization: 'Bearer ' + this.state.jwt,
         };
         axios({
             method: 'GET',
-            url: 'http://karigar.greelogix.com/api/me',
+            url: 'http://karigar.greelogix.com/api/me/' + unique_id,
             headers: headers,
         }).then(response => {
-            // //console.log(response);
+            console.log(response);
             if (response.data.status == "error") {
                 this.setState({
                     error: response.data.message,
@@ -331,6 +339,7 @@ export default class PlaceOrder extends Component {
                 services: response.data.services,
                 servicesRaw: response.data.serviesRaw,
                 service_desc: service.description,
+                unique_id: unique_id,
                 loading: false,
             });
 
@@ -463,7 +472,7 @@ export default class PlaceOrder extends Component {
         } else {
             const { services, servicesRaw } = this.state;
             //console.log(services);
-            //console.log("aaaa")
+            console.log("aaaa")
             const { errorText } = styles;
             return (
                 <View style={{ flex: 1 }}>

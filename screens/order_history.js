@@ -8,6 +8,8 @@ import AppHeader from '../components/AppHeader';
 import deviceStorage from '../services/deviceStorage.js';
 import { Loading } from '../components/common/';
 import axios from 'axios';
+import { getUniqueId, getManufacturer } from 'react-native-device-info';
+
 const sttus = {
     "-1": "Cancelled",
     "0": 'Un-Assigned',
@@ -30,10 +32,11 @@ export default class order_history extends Component {
         this.deleteJWT = deviceStorage.deleteJWT.bind(this);
         this.loadJWT = deviceStorage.loadJWT.bind(this);
         this.loadOrders = this.loadOrders.bind(this);
+        this.loadOrders();
         this.loadJWT().then(() => {
             // console.log(res)
             // this.setState({ loading: false });
-            this.loadOrders();
+
         });
     }
     newJWT(jwt) {
@@ -94,17 +97,18 @@ export default class order_history extends Component {
     }
     loadOrders = () => {
         console.log("Orders loading")
-
+        var UniqueId = getUniqueId();
+        console.log(UniqueId);
         // console.log(this.state.jwt)
         const headers = {
             Authorization: 'Bearer ' + this.state.jwt,
         };
         axios({
             method: 'GET',
-            url: 'http://karigar.greelogix.com/api/orders',
+            url: 'http://karigar.greelogix.com/api/orders/' + UniqueId,
             headers: headers,
         }).then(response => {
-            // console.log(response);
+            console.log(response);
             this.setState({
                 orders: response.data.orders,
                 loading: false,
